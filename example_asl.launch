@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-
+    <!-- Setting simulation -->
     <arg name="robot_x" default="88.0"/>
     <arg name="robot_y" default="58.0"/>
     <arg name="robot_z" default="11.0"/>
@@ -9,14 +9,13 @@
     <include file="$(find example_world)/launch/example_world.launch">
     </include>
     
-    <!-- Add a single Moose robot -->
     <include file="$(find warthog_gazebo)/launch/spawn_warthog.launch" >
       <arg name="x" value="$(arg robot_x)"/>
       <arg name="y" value="$(arg robot_y)"/>
       <arg name="z" value="$(arg robot_z)"/>
       <arg name="yaw" value="$(arg robot_yaw)"/>
     </include>
-
+    <!-- Setting simulation -->
 
   <!-- Run a passthrough filter to down-sample the sensor point cloud.-->
   <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen"/>
@@ -45,9 +44,10 @@
     <rosparam command="load" file="$(find elevation_mapping_demos)/config/robots/example_asl.yaml"/>
     <rosparam command="load" file="$(find elevation_mapping_demos)/config/postprocessing/postprocessor_pipeline.yaml"/>
   </node>
-
-    <node pkg="tf2_ros" type="static_transform_publisher" name="map_tf" args="0 0 0 0 0 0 map odom 100"/>
-
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cloud_sim)/launch/cloud_rviz.rviz"/>
+  
+  <!-- Setting simulation -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map_tf" args="0 0 0 0 0 0 map odom 100"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find example_sim)/launch/example_rviz.rviz"/>
+  <!-- Setting simulation -->
 
 </launch>

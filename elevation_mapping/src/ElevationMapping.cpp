@@ -242,7 +242,7 @@ bool ElevationMapping::readParameters(bool reload) {
 
   grid_map::Length length;
   grid_map::Position position;
-  double resolution{0.01};
+  double resolution{0.5};
   nodeHandle_.param("length_in_x", length(0), 1.5);
   nodeHandle_.param("length_in_y", length(1), 1.5);
   nodeHandle_.param("position_x", position.x(), 0.0);
