@@ -424,6 +424,8 @@ This is the main Robot-Centric Elevation Mapping node. It uses the distance sens
 1. Installation 내용을 확인 할 것.
 2. Dependencies의 목록을 확인하고 실행 전에 설치할 것.
 3. example_asl.launch 파일은 실행 가능한 파일이 아닌 예시 파일로 하기 내용을 추가적으로 확인하고 수정하고 사용하길 권장함.
+4. 사용가능한 토픽은 `/elevation_mapping/elevation_map_raw`로 `grid_map_msgs/GridMap`타입.
+5. 위 토픽은 다양한 레이어를 가지고 있으니 사용하기에 용이한 레이어를 선택하여 이용하기 바람.
 
 ### example
 
@@ -470,19 +472,11 @@ elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
   차량 frame_id로 설정.
   `map_frame_id` 내용과 동일.
 
-* **`robot_msg_type`**
-  
-  수신할 차량 위치데이터의 토픽메세지 타입 지정.
-  
-  pose      : **`<geometry_msgs::PoseWithCovarianceStamped>`**
-  
-  odom      : **`<nav_msgs::Odometry>`** (default)
-  
-  position  : **`<geometry_msgs::Pose>`**
-
 * **`robot_pose_topic`**
   
   수신할 차량 위치데이터의 토픽을 지정.
+  
+  만약,`nav_msgs/Odometry`이외에 다른 메세지를 사용할 경우 `elevation_mapping/src/ElevationMaping.cpp`와 `elevation_mapping/include/elevation_mapping/ElvationMapping.hpp`에서 `Change your message`를 검색하여 수정할 것.
 
 * **`input_sources`**
   
