@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="robot_x" default="88.0"/>
+    <arg name="robot_y" default="58.0"/>
+    <arg name="robot_z" default="11.0"/>
+    <arg name="robot_yaw" default="0" />
+
+    <include file="$(find example_world)/launch/example_world.launch">
+    </include>
+    
+    <!-- Add a single Moose robot -->
+    <include file="$(find warthog_gazebo)/launch/spawn_warthog.launch" >
+      <arg name="x" value="$(arg robot_x)"/>
+      <arg name="y" value="$(arg robot_y)"/>
+      <arg name="z" value="$(arg robot_z)"/>
+      <arg name="yaw" value="$(arg robot_yaw)"/>
+    </include>
+
+
+  <!-- Run a passthrough filter to down-sample the sensor point cloud.-->
+  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen"/>
+  <node pkg="nodelet" type="nodelet" name="pass_through_filter" args="load pcl/PassThrough pcl_manager" output="screen">
+    <remap from="~input" to="/velodyne_points"/>
+    <rosparam>
+      filter_field_name: x
+      filter_limit_min: 0.01
+      filter_limit_max: 15.0  <!-- Limit the range of points to forward to 6 meters in viewing direction-->
+    </rosparam>
+  </node>
+  <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="/pass_through_filter/output"/>
+    <remap from="~output" to="/velodyne_points/points_downsampled"/>
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.0
+      filter_limit_max: 6.0  <!-- Limit the range of points to forward to 6 meters in viewing direction-->
+      filter_limit_negative: False
+      leaf_size: 0.05  <!-- Limit the density to 5 cm-->
+    </rosparam>
+  </node>
+  
+
+  <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
+    <rosparam command="load" file="$(find elevation_mapping_demos)/config/robots/example_asl.yaml"/>
+    <rosparam command="load" file="$(find elevation_mapping_demos)/config/postprocessing/postprocessor_pipeline.yaml"/>
+  </node>
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="map_tf" args="0 0 0 0 0 0 map odom 100"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cloud_sim)/launch/cloud_rviz.rviz"/>
+
+</launch>

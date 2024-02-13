@@ -275,7 +275,6 @@ class ElevationMapping {
   InputSourceManager inputSources_;
   //! ROS subscribers.
   ros::Subscriber pointCloudSubscriber_;  //!< Deprecated, use input_source instead.
-  message_filters::Subscriber<geometry_msgs::PoseWithCovarianceStamped> robotPoseSubscriber_;
 
   //! ROS service servers.
   ros::ServiceServer fusionTriggerService_;
@@ -294,9 +293,6 @@ class ElevationMapping {
 
   //! Callback queue for fusion service thread.
   ros::CallbackQueue fusionServiceQueue_;
-
-  //! Cache for the robot pose messages.
-  message_filters::Cache<geometry_msgs::PoseWithCovarianceStamped> robotPoseCache_;
 
   //! TF listener and broadcaster.
   tf::TransformListener transformListener_;
@@ -361,6 +357,9 @@ class ElevationMapping {
 
     //! Initial variance when setting a submap.
     double initSubmapVariance_{0.01};
+
+    //! Robot tracking pose or odom. Message Type.
+    std::string robotMsgType_;
   };
   ThreadSafeDataWrapper<Parameters> parameters_;
 

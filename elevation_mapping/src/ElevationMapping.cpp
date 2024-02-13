@@ -71,9 +71,33 @@ void ElevationMapping::setupSubscribers() {  // Handle deprecated point_cloud_to
   }
 
   if (!parameters.robotPoseTopic_.empty()) {
-    robotPoseSubscriber_.subscribe(nodeHandle_, parameters.robotPoseTopic_, 1);
-    robotPoseCache_.connectInput(robotPoseSubscriber_);
-    robotPoseCache_.setCacheSize(parameters.robotPoseCacheSize_);
+    
+    if (parameters.robotMsgType_ == "pose") {
+      message_filters::Subscriber<geometry_msgs::PoseWithCovarianceStamped> robotPoseSubscriber_;
+      robotPoseSubscriber_.subscribe(nodeHandle_, parameters.robotPoseTopic_, 1);
+
+      message_filters::Cache<geometry_msgs::PoseWithCovarianceStamped> robotPoseCache_;
+      robotPoseCache_.connectInput(robotPoseSubscriber_);
+      robotPoseCache_.setCacheSize(parameters.robotPoseCacheSize_);
+    
+    } else if (parameters.robotMsgType_ == "odom")
+    {
+      message_filters::Subscriber<nav_msgs::Odometry> robotPoseSubscriber_;
+      robotPoseSubscriber_.subscribe(nodeHandle_, parameters.robotPoseTopic_, 1);
+
+      message_filters::Cache<nav_msgs::Odometry> robotPoseCache_;
+      robotPoseCache_.connectInput(robotPoseSubscriber_);
+      robotPoseCache_.setCacheSize(parameters.robotPoseCacheSize_);
+
+    } else if (parameters.robotMsgType_ == "position") {
+      message_filters::Subscriber<gemometry_msgs::Pose> robotPoseSubscriber_;
+      robotPoseSubscriber_.subscribe(nodeHandle_, parameters.robotPoseTopic_, 1);
+
+      message_filters::Cache<geometry_msgs::PoseWithCovarianceStamped> robotPoseCache_;
+      robotPoseCache_.connectInput(robotPoseSubscriber_);
+      robotPoseCache_.setCacheSize(parameters.robotPoseCacheSize_);
+    }
+    
   } else {
     parameters.ignoreRobotMotionUpdates_ = true;
   }
@@ -164,7 +188,7 @@ bool ElevationMapping::readParameters(bool reload) {
   auto [parameters, parametersGuard] = parameters_.getDataToWrite();
   auto [mapParameters, mapParametersGuard] = map_.parameters_.getDataToWrite();
   nodeHandle_.param("point_cloud_topic", parameters.pointCloudTopic_, std::string("/points"));
-  nodeHandle_.param("robot_pose_with_covariance_topic", parameters.robotPoseTopic_, std::string("/pose"));
+  nodeHandle_.param("robot_pose_topic", parameters.robotPoseTopic_, std::string("/pose"));
   nodeHandle_.param("track_point_frame_id", parameters.trackPointFrameId_, std::string("/robot"));
   nodeHandle_.param("track_point_x", parameters.trackPoint_.x(), 0.0);
   nodeHandle_.param("track_point_y", parameters.trackPoint_.y(), 0.0);
@@ -213,6 +237,8 @@ bool ElevationMapping::readParameters(bool reload) {
 
   // ElevationMap parameters. TODO Move this to the elevation map class.
   nodeHandle_.param("map_frame_id", parameters.mapFrameId_, std::string("/map"));
+
+  nodeHandel_.param("robot_msg_type", parmeters.robotMsgType_, std::string("odom"));
 
   grid_map::Length length;
   grid_map::Position position;
@@ -355,8 +381,20 @@ void ElevationMapping::pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr
   Eigen::Matrix<double, 6, 6> robotPoseCovariance;
   robotPoseCovariance.setZero();
   if (!parameters.ignoreRobotMotionUpdates_) {
-    boost::shared_ptr<geometry_msgs::PoseWithCovarianceStamped const> poseMessage =
-        robotPoseCache_.getElemBeforeTime(lastPointCloudUpdateTime_);
+    if (parameters.robotMsgType_ == "pose") {
+      boost::shared_ptr<geometry_msgs::PoseWithCovarianceStamped const> poseMessage =
+          robotPoseCache_.getElemBeforeTime(lastPointCloudUpdateTime_);
+    } else if (parameters.robotMsgType_ == "odom")
+    {
+      boost::shared_ptr<nav_msgs::Odometry const> poseMessage =
+          robotPoseCache_.getElemBeforeTime(lastPointCloudUpdateTime_);
+    } else if (parameters.robotMsgType_ == "position") {
+      boost::shared_ptr<geometry_msgs::Pose const> poseMessage =
+          robotPoseCache_.getElemBeforeTime(lastPointCloudUpdateTime_);
+    } else {
+      ROS_ERROR("Check your Robot Message Type. HMS says.");
+    }
+
     if (!poseMessage) {
       // Tell the user that either for the timestamp no pose is available or that the buffer is possibly empty
       if (robotPoseCache_.getOldestTime().toSec() > lastPointCloudUpdateTime_.toSec()) {
@@ -507,7 +545,17 @@ bool ElevationMapping::updatePrediction(const ros::Time& time) {
   }
 
   // Get robot pose at requested time.
-  boost::shared_ptr<geometry_msgs::PoseWithCovarianceStamped const> poseMessage = robotPoseCache_.getElemBeforeTime(time);
+  if (parameters.robotMsgType_ == "pose") {
+    boost::shared_ptr<geometry_msgs::PoseWithCovarianceStamped const> poseMessage = robotPoseCache_.getElemBeforeTime(time);
+  } else if (parameters.robotMsgType_ == "odom")
+  {
+    boost::shared_ptr<nav_msgs::Odometry const> poseMessage = robotPoseCache_.getElemBeforeTime(time);
+  } else if (parameters.robotMsgType_ == "position") {
+    boost::shared_ptr<geometry_msgs::Pose const> poseMessage = robotPoseCache_.getElemBeforeTime(time);
+  } else {
+    ROS_ERROR("Check your Robot Message Type. HMS says.");
+  }
+  
   if (!poseMessage) {
     // Tell the user that either for the timestamp no pose is available or that the buffer is possibly empty
     if (robotPoseCache_.getOldestTime().toSec() > lastPointCloudUpdateTime_.toSec()) {
