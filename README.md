@@ -430,16 +430,18 @@ This is the main Robot-Centric Elevation Mapping node. It uses the distance sens
 **예제파일**
 
 example_asl.launch
+
 elevation_mapping_demos/config/robots/example_asl.yaml
+
 elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
 
 #### example_asl.launch
 
-* **'<!-- Setting simulation -->'**
+* **'Setting simulation'**
   
   해당 주석이 붙어 있는 부분의 경우, 로컬맵을 위한 구성이 아니며 시뮬레이션 실행을 위한 세팅임.
 
-* **pcl_manager**
+* **'pcl_manager'**
   
   point cloud를 전처리 기능을 가진 library로 예제에서는 pass_through_filter와 voxelgrid를 수행.
   '~input'에 처리할 point cloud의 토픽을 지정.
@@ -447,15 +449,15 @@ elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
   pass_through_filter : point cloud를 사용자가 원하는 부분만 잘라냄.
   VoxelGird           : point cloud를 다운샘플링함.
 
-* **elevation_mapping**
+* **'elevation_mapping'**
   
   robot과 postprocessing에 관련된 yaml 파일을 불러와 패키지를 실행시킴.
 
 #### elevation_mapping_demos/config/robots/example_asl.yaml
 
-**Note**
+- **Note**
 
-수정이 필요한 부분을 중점적으로 부가 설명. 하기되지 않은 내용은 원 패키지의 내용을 살펴볼 것.
+- 수정이 필요한 부분을 중점적으로 부가 설명. 하기되지 않은 내용은 원 패키지의 내용을 살펴볼 것.
 
 * **'map_frame_id'**
   
@@ -529,12 +531,12 @@ elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
 
 #### elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
 
-**Note**
+- **Note**
 
-해당 파일은 수정하여 사용할 필요가 없음. 하지만 터미널에 지속적인 경고가 뜨는 것이 불편하다면 수정할 것.
+- 해당 파일은 수정하여 사용할 필요가 없음. 하지만 터미널에 지속적인 경고가 뜨는 것이 불편하다면 수정할 것.
 
-**'resolution'**값을 0.5보다 크게 설정하여 사용할 경우, 지속적인 경고가 발생.
-해당 내용은 전체맵을 매핑하는데에 있어서 발생하는 문제로 수정할 필요가 없지만 경고가 불편하다면 두 개의 **'radius'**값을 **'resolution'**값보다 크게 설정하여 사용.
+- **'resolution'**값을 0.5보다 크게 설정하여 사용할 경우, 지속적인 경고가 발생.
+- 해당 내용은 전체맵을 매핑하는데에 있어서 발생하는 문제로 수정할 필요가 없지만 경고가 불편하다면 두 개의 **'radius'**값을 **'resolution'**값보다 크게 설정하여 사용.
 
 
 [ROS]: http://www.ros.org
