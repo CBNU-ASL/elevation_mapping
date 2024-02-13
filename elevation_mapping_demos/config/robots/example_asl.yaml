@@ -1,7 +1,6 @@
 # Robot.
 map_frame_id:                               base_link
 robot_base_frame_id:                        base_link
-robot_msg_type:                             odom
 robot_pose_topic:                           /odom
 robot_pose_cache_size:                      200
 input_sources:
