@@ -462,18 +462,22 @@ elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
 * **`map_frame_id`**
   
   차량 frame_id로 설정.
-  원 패키지의 경우, 매핑을 진행하기 위하여 map_frame_id를 따로 불러와 사용하였지만 로컬맵 사용시 차량 프레임으로 설정.
+  
+  원 패키지의 경우, 매핑을 진행하기 위하여 `map_frame_id`를 따로 불러와 사용하였지만 로컬맵 사용시 차량 프레임으로 설정.
 
 * **`robot_base_frame_id`**
   
   차량 frame_id로 설정.
-  **`map_frame_id`** 내용과 동일.
+  `map_frame_id` 내용과 동일.
 
 * **`robot_msg_type`**
   
   수신할 차량 위치데이터의 토픽메세지 타입 지정.
+  
   pose      : **`<geometry_msgs::PoseWithCovarianceStamped>`**
+  
   odom      : **`<nav_msgs::Odometry>`** (default)
+  
   position  : **`<geometry_msgs::Pose>`**
 
 * **`robot_pose_topic`**
@@ -499,16 +503,19 @@ elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
 * **`length_in_x`**
   
   map의 x방향 길이.
+  
   30으로 지정할 경우, 전방 15m를 바라볼 수 있음.(default)
 
 * **`length_in_y`**
   
   map의 y방향 길이.
+  
   10으로 지정할 경우, 좌우 각각 5m를 바라볼 수 있음.(default)
 
 * **`resolution`**
   
   resolution을 너무 작게 설정할 경우(0.1), 전방으로 멀어질수록 로컬맵의 값이 존재하지 않는 경우가 많음.
+  
   그 때문에 0.3에서 0.5로 사용할 것을 권장.(0.5, default)
 
 * **`enable_visibility_cleanup`**(default, true)
@@ -518,7 +525,9 @@ elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
 * **`enable_continuous_cleanup`**
   
   매핑되는 지도를 지속적으로 정리하여 새로운 센서 데이터가 수신될 때마다 모든 값을 지우고 새로운 데이터로 매핑.
-  해당 내용이 활성화 될 경우, **`enable_visibility_cleanup`**은 자동으로 비활성화됨.
+  
+  해당 내용이 활성화 될 경우, `enable_visibility_cleanup`은 자동으로 비활성화됨.
+  
   로컬맵으로 사용할 경우, 해당 내용을 활성화.
 
 * **`initialize_elevation_map`**
@@ -535,8 +544,10 @@ elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
 
   해당 파일은 수정하여 사용할 필요가 없음. 하지만 터미널에 지속적인 경고가 뜨는 것이 불편하다면 수정할 것.
 
-  **`resolution`**값을 0.5보다 크게 설정하여 사용할 경우, 지속적인 경고가 발생.
-  해당 내용은 전체맵을 매핑하는데에 있어서 발생하는 문제로 수정할 필요가 없지만 경고가 불편하다면 두 개의 **`radius`**값을 **`resolution`**값보다 크게 설정하여 사용.
+
+  `resolution`값을 0.5보다 크게 설정하여 사용할 경우, 지속적인 경고가 발생.
+  
+  해당 내용은 전체맵을 매핑하는데에 있어서 발생하는 문제로 수정할 필요가 없지만 경고가 불편하다면 두 개의 `radius`값을 `resolution`값보다 크게 설정하여 사용.
 
 
 [ROS]: http://www.ros.org
