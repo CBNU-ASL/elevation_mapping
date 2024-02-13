@@ -164,7 +164,7 @@ bool ElevationMapping::readParameters(bool reload) {
   auto [parameters, parametersGuard] = parameters_.getDataToWrite();
   auto [mapParameters, mapParametersGuard] = map_.parameters_.getDataToWrite();
   nodeHandle_.param("point_cloud_topic", parameters.pointCloudTopic_, std::string("/points"));
-  nodeHandle_.param("robot_pose_with_covariance_topic", parameters.robotPoseTopic_, std::string("/map"));
+  nodeHandle_.param("robot_pose_topic", parameters.robotPoseTopic_, std::string("/pose"));
   nodeHandle_.param("track_point_frame_id", parameters.trackPointFrameId_, std::string("/robot"));
   nodeHandle_.param("track_point_x", parameters.trackPoint_.x(), 0.0);
   nodeHandle_.param("track_point_y", parameters.trackPoint_.y(), 0.0);
@@ -217,8 +217,8 @@ bool ElevationMapping::readParameters(bool reload) {
   grid_map::Length length;
   grid_map::Position position;
   double resolution{0.01};
-  nodeHandle_.param("length_in_x", length(0), 1.5);
-  nodeHandle_.param("length_in_y", length(1), 1.5);
+  nodeHandle_.param("length_in_x", length(0), 30.0);
+  nodeHandle_.param("length_in_y", length(1), 10.0);
   nodeHandle_.param("position_x", position.x(), 0.0);
   nodeHandle_.param("position_y", position.y(), 0.0);
   nodeHandle_.param("resolution", resolution, resolution);
@@ -519,7 +519,7 @@ bool ElevationMapping::updatePrediction(const ros::Time& time) {
   // boost::shared_ptr<geometry_msgs::PoseWithCovarianceStamped const> poseMessage = robotPoseCache_.getElemBeforeTime(time);
   boost::shared_ptr<nav_msgs::Odometry const> poseMessage = robotPoseCache_.getElemBeforeTime(time);
   // Change your message
-  
+
   if (!poseMessage) {
     // Tell the user that either for the timestamp no pose is available or that the buffer is possibly empty
     if (robotPoseCache_.getOldestTime().toSec() > lastPointCloudUpdateTime_.toSec()) {
