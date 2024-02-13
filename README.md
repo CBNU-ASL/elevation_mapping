@@ -418,15 +418,102 @@ This is the main Robot-Centric Elevation Mapping node. It uses the distance sens
   - In between: A higher value puts more bias on the existing, prior estimate. A convex combination of both height and variance between
     estimate and measurement will be formed to initialize the new gaussian height distribution.
 
-## Changelog
+## ASL
 
-See [Changelog]
+### Note
+1. Installation 내용을 확인 할 것.
+2. Dependencies의 목록을 확인하고 실행 전에 설치할 것.
+3. example_asl.launch 파일은 실행 가능한 파일이 아닌 예시 파일로 하기 내용을 추가적으로 확인하고 수정하고 사용하길 권장함.
 
-## Bugs & Feature Requests
+### example
 
-Please report bugs and request features using the [Issue Tracker](https://github.com/anybotics/elevation_mapping/issues).
+**예제파일**
+example_asl.launch
+elevation_mapping_demos/config/robots/example_asl.yaml
+elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
 
-[Changelog]: CHANGELOG.rst
+#### example_asl.launch
+
+* **'<!-- Setting simulation -->'**
+  해당 주석이 붙어 있는 부분의 경우, 로컬맵을 위한 구성이 아니며 시뮬레이션 실행을 위한 세팅임.
+
+* **pcl_manager**
+  point cloud를 전처리 기능을 가진 library로 예제에서는 pass_through_filter와 voxelgrid를 수행.
+  '~input'에 처리할 point cloud의 토픽을 지정.
+  '~output'에 전처리를 완료하여 발행할 토픽을 지정.(지정하지 않을 경우, 실행시킨 전처리기능에 따라 다르게 출력(ex./pass_through_filter/output)).
+  pass_through_filter : point cloud를 사용자가 원하는 부분만 잘라냄.
+  VoxelGird           : point cloud를 다운샘플링함.
+
+* **elevation_mapping**
+  robot과 postprocessing에 관련된 yaml 파일을 불러와 패키지를 실행시킴.
+
+#### elevation_mapping_demos/config/robots/example_asl.yaml
+**Note**
+수정이 필요한 부분을 중점적으로 부가 설명. 하기되지 않은 내용은 원 패키지의 내용을 살펴볼 것.
+
+* **'map_frame_id'**
+  차량 frame_id로 설정.
+  원 패키지의 경우, 매핑을 진행하기 위하여 map_frame_id를 따로 불러와 사용하였지만 로컬맵 사용시 차량 프레임으로 설정.
+
+* **'robot_base_frame_id'**
+  차량 frame_id로 설정.
+  **'map_frame_id'** 내용과 동일.
+
+* **'robot_msg_type'**
+  수신할 차량 위치데이터의 토픽메세지 타입 지정.
+  pose      : **'<geometry_msgs::PoseWithCovarianceStamped>'**
+  odom      : **'<nav_msgs::Odometry>'** (default)
+  position  : **'<geometry_msgs::Pose>'**
+
+* **'robot_pose_topic'**
+  수신할 차량 위치데이터의 토픽을 지정.
+
+* **'input_sources'**
+  **'topic'**  : 로컬맵에 사용할 pointcloud 토픽명을 지정.
+
+* **'sensor_processor/ignore_points_above'**
+  임계값을 초과하는 높이를 갖은 pointcloud는 무시함.(default : inf)
+
+* **'sensor_processor/ignore_points_below'**
+  임계값미만 높이를 갖은 pointcloud는 무시함.(default : -inf)
+
+* **'track_point_frame_id'**
+  pointcloud가 따라가야 하는 프레임을 지정. 디폴트의 경우, 차량의 프레임 사용.
+
+* **'length_in_x'**
+  map의 x방향 길이.
+  30으로 지정할 경우, 전방 15m를 바라볼 수 있음.(default)
+
+* **'length_in_y'**
+  map의 y방향 길이.
+  10으로 지정할 경우, 좌우 각각 5m를 바라볼 수 있음.(default)
+
+* **'resolution'**
+  resolution을 너무 작게 설정할 경우(0.1), 전방으로 멀어질수록 로컬맵의 값이 존재하지 않는 경우가 많음.
+  그 때문에 0.3에서 0.5로 사용할 것을 권장.(0.5, default)
+
+* **'enable_visibility_cleanup'**(default, true)
+  센서에 표시되지 않는 요소를 지도에서 제거하는 별도의 스레드를 활성화/비활성화.
+  
+* **'enable_continuous_cleanup'**
+  매핑되는 지도를 지속적으로 정리하여 새로운 센서 데이터가 수신될 때마다 모든 값을 지우고 새로운 데이터로 매핑.
+  해당 내용이 활성화 될 경우, **'enable_visibility_cleanup'**은 자동으로 비활성화됨.
+  로컬맵으로 사용할 경우, 해당 내용을 활성화.
+
+* **'initialize_elevation_map'**
+  매핑을 시작하기전 초기지도 세팅. false로 사용.
+
+* **'target_frame_init_submap'**
+  차량의 프레임과 같게 세팅.
+
+#### elevation_mapping_demos/config/postprocessing/postprocessor_pipeline.yaml
+**Note**
+해당 파일은 수정하여 사용할 필요가 없음. 하지만 터미널에 지속적인 경고가 뜨는 것이 불편하다면 수정할 것.
+
+**'resolution'**값을 0.5보다 크게 설정하여 사용할 경우, 지속적인 경고가 발생.
+해당 내용은 전체맵을 매핑하는데에 있어서 발생하는 문제로 수정할 필요가 없지만 경고가 불편하다면 두 개의 **'radius'**값을 **'resolution'**값보다 크게 설정하여 사용.
+
+
 [ROS]: http://www.ros.org
 [rviz]: http://wiki.ros.org/rviz
 [grid_map_msgs/GridMap]: https://github.com/anybotics/grid_map/blob/master/grid_map_msgs/msg/GridMap.msg
