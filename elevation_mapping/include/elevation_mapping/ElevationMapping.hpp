@@ -14,6 +14,7 @@
 #include <grid_map_msgs/SetGridMap.h>
 
 // ROS
+#include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <message_filters/cache.h>
 #include <message_filters/subscriber.h>
@@ -275,6 +276,10 @@ class ElevationMapping {
   InputSourceManager inputSources_;
   //! ROS subscribers.
   ros::Subscriber pointCloudSubscriber_;  //!< Deprecated, use input_source instead.
+  // Change your message
+  // message_filters::Subscriber<geometry_msgs::PoseWithCovarianceStamped> robotPoseSubscriber_;
+  message_filters::Subscriber<nav_msgs::Odometry> robotPoseSubscriber_;
+  // Change your message
 
   //! ROS service servers.
   ros::ServiceServer fusionTriggerService_;
@@ -288,11 +293,19 @@ class ElevationMapping {
   ros::ServiceServer loadMapService_;
   ros::ServiceServer reloadParametersService_;
 
+  // ros::ServiceClient map_reset_client;
+
   //! Callback thread for the fusion services.
   boost::thread fusionServiceThread_;
 
   //! Callback queue for fusion service thread.
   ros::CallbackQueue fusionServiceQueue_;
+
+  //! Cache for the robot pose messages.
+  // Change your message
+  // message_filters::Cache<geometry_msgs::PoseWithCovarianceStamped> robotPoseCache_;
+  message_filters::Cache<nav_msgs::Odometry> robotPoseCache_;
+  // Change your message
 
   //! TF listener and broadcaster.
   tf::TransformListener transformListener_;
@@ -357,9 +370,6 @@ class ElevationMapping {
 
     //! Initial variance when setting a submap.
     double initSubmapVariance_{0.01};
-
-    //! Robot tracking pose or odom. Message Type.
-    std::string robotMsgType_;
   };
   ThreadSafeDataWrapper<Parameters> parameters_;
 
